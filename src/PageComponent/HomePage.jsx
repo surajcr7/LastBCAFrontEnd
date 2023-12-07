@@ -30,6 +30,10 @@ const HomePage = () => {
   const [products, setProducts] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [tempSearchText, setTempSearchText] = useState("");
+  const [recommendProducts, setRecommendProducts] = useState([]);
+  const [nearestProducts, setNearestProducts] = useState([])
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,6 +57,7 @@ const HomePage = () => {
           );
         }
         if (response.data) {
+          console.log(response.data.products)
           setProducts(response.data.products);
         }
       } catch (error) {
@@ -62,9 +67,54 @@ const HomePage = () => {
 
     fetchData();
   }, [categoryId, searchText]);
+  useEffect(()=>{
+    const fetchData = async()=>{{
+      let response = await axios.get(
+        `http://localhost:8080/api/product/fetch/all`
+      );
+      setRecommendProducts(response.data.products)
+    
+      
+    }
+    
+  }
+fetchData()
+},[recommendProducts])
+useEffect(()=>{
+  const fetchData = async()=>{{
+    let response = await axios.get(
+      `http://localhost:8080/api/product/fetch/all`
+    );
+  
+    setNearestProducts(response.data.products)
+    
+  }
+  
+}
+fetchData()
+},[ nearestProducts])
+ 
+      const handleRecommend = ()=>{
+        setProducts([])
+
+        const reco = recommendProducts.filter((curr)=>curr.id !== 1)
+        console.log("hello", reco)
+    setProducts(reco)
+
+  }
+  const handleNearest = ()=>{
+    setProducts([])
+    const nearest = nearestProducts.filter((curr)=>curr.id !== 2)
+    console.log("hello suraj", nearest)
+
+ setProducts(nearest)
+  }
+
+
 
   const searchProducts = (e) => {
     e.preventDefault();
+    handleRecommend()
     setSearchText(tempSearchText);
   };
 
@@ -100,10 +150,11 @@ const HomePage = () => {
           </div>
         </form>
       </div>
-      <div className="col-auto d-flex justify-content-around w-25">
-        <button class="btn bg-color custom-bg-text mb-3 ">Recomended Product</button>
-        <button class="btn bg-color custom-bg-text mb-3" >Nearest Product</button>
-      </div>
+     <div className="col-auto d-flex justify-content-around w-25">
+    <button class="btn bg-color custom-bg-text mb-3" onClick={handleRecommend}>Recomended Product</button>
+    <button class="btn bg-color custom-bg-text mb-3 ml-2" onClick={handleNearest}>Nearest Product</button>
+</div>
+
       <div className="col-md-12 mt-3 mb-5">
         <div className="row row-cols-1 row-cols-md-4 g-4">
           {products.map((product) => {
